@@ -13,7 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            EventSeeder::class,
+            // ConcertSeeder::class, // Uncomment if using individual concert seeding
+            TicketSeeder::class,
+            PaymentSeeder::class
+        ]);
 
         User::factory()->create([
             'name' => 'Test User',
