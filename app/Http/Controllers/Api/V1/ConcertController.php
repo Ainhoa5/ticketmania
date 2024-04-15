@@ -8,14 +8,21 @@ use App\Http\Resources\V1\ConcertResource;
 use App\Models\Concert;
 use App\Http\Requests\StoreConcertsRequest;
 use App\Http\Requests\UpdateConcertsRequest;
+use App\Filters\V1\ConcertFilter;
+use Illuminate\Http\Request;
 class ConcertController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return new ConcertCollection(Concert::paginate());
+        $filter = new ConcertFilter();
+        $filterItems = $filter->transform($request); // Transforms query parameters into filter criteria
+
+        $concerts = Concert::where($filterItems); // Applies filters to the query
+
+        return new ConcertCollection($concerts->paginate()->appends($request->query())); // Returns paginated results
     }
 
     /**

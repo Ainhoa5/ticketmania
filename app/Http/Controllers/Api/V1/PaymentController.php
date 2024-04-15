@@ -8,16 +8,24 @@ use App\Http\Resources\V1\PaymentResource;
 use App\Models\Payment;
 use App\Http\Requests\StorePaymentsRequest;
 use App\Http\Requests\UpdatePaymentsRequest;
+use App\Filters\V1\PaymentFilter;
+use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return new PaymentCollection(Payment::paginate());
-    }
+    public function index(Request $request)
+{
+    $filter = new PaymentFilter();
+    $filterItems = $filter->transform($request); // Transforms API query parameters into SQL filter criteria
+
+    $payments = Payment::where($filterItems);
+
+    return new PaymentCollection($payments->paginate()->appends($request->query()));
+}
+
 
     /**
      * Show the form for creating a new resource.
