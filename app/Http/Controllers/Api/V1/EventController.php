@@ -1,19 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
+use App\Http\Controllers\Controller;
 
-use App\Models\Events;
+use App\Http\Resources\V1\EventCollection;
+use App\Http\Resources\V1\EventResource;
+use App\Models\Event;
 use App\Http\Requests\StoreEventsRequest;
 use App\Http\Requests\UpdateEventsRequest;
 
-class EventsController extends Controller
+class EventController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return new EventCollection(Event::paginate());
     }
 
     /**
@@ -35,15 +38,15 @@ class EventsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Events $events)
+    public function show(Event $event)
     {
-        //
+        return new EventResource($event);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Events $events)
+    public function edit(Event $events)
     {
         //
     }
@@ -51,7 +54,7 @@ class EventsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEventsRequest $request, Events $events)
+    public function update(UpdateEventsRequest $request, Event $events)
     {
         //
     }
@@ -59,7 +62,7 @@ class EventsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Events $events)
+    public function destroy(Event $events)
     {
         //
     }

@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
+use App\Http\Controllers\Controller;
 
-use App\Models\Concerts;
+use App\Http\Resources\V1\ConcertCollection;
+use App\Http\Resources\V1\ConcertResource;
+use App\Models\Concert;
 use App\Http\Requests\StoreConcertsRequest;
 use App\Http\Requests\UpdateConcertsRequest;
-
-class ConcertsController extends Controller
+class ConcertController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return new ConcertCollection(Concert::paginate());
     }
 
     /**
@@ -35,15 +37,15 @@ class ConcertsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Concerts $concerts)
+    public function show(Concert $concerts)
     {
-        //
+        return new ConcertResource($concerts);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Concerts $concerts)
+    public function edit(Concert $concerts)
     {
         //
     }
@@ -51,7 +53,7 @@ class ConcertsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateConcertsRequest $request, Concerts $concerts)
+    public function update(UpdateConcertsRequest $request, Concert $concerts)
     {
         //
     }
@@ -59,7 +61,7 @@ class ConcertsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Concerts $concerts)
+    public function destroy(Concert $concerts)
     {
         //
     }

@@ -19,7 +19,6 @@ class TicketFactory extends Factory
         return [
             'concert_id' => \App\Models\Concert::factory(), // This will automatically create a Concert if not specified.
             'user_id' => \App\Models\User::factory(), // This will automatically create a User if not specified.
-            'status' => $this->faker->randomElement(['available', 'sold'])
         ];
     }
 }
