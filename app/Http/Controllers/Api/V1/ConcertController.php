@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ConcertCollection;
 use App\Http\Resources\V1\ConcertResource;
 use App\Models\Concert;
-use App\Http\Requests\StoreConcertsRequest;
-use App\Http\Requests\UpdateConcertsRequest;
+use App\Http\Requests\V1\StoreConcertsRequest;
+use App\Http\Requests\V1\UpdateConcertsRequest;
 use App\Filters\V1\ConcertFilter;
 use Illuminate\Http\Request;
 class ConcertController extends Controller
@@ -38,7 +38,7 @@ class ConcertController extends Controller
      */
     public function store(StoreConcertsRequest $request)
     {
-        //
+        return new ConcertResource(Concert::create($request->all()));
     }
 
     /**

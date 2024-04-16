@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\PaymentCollection;
 use App\Http\Resources\V1\PaymentResource;
 use App\Models\Payment;
-use App\Http\Requests\StorePaymentsRequest;
-use App\Http\Requests\UpdatePaymentsRequest;
+use App\Http\Requests\V1\StorePaymentsRequest;
+use App\Http\Requests\V1\UpdatePaymentsRequest;
 use App\Filters\V1\PaymentFilter;
 use Illuminate\Http\Request;
 
@@ -40,7 +40,7 @@ class PaymentController extends Controller
      */
     public function store(StorePaymentsRequest $request)
     {
-        //
+        return new PaymentResource(Payment::create($request->all()));
     }
 
     /**

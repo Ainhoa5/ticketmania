@@ -7,9 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\EventCollection;
 use App\Http\Resources\V1\EventResource;
 use App\Filters\V1\EventFilter;
-use App\Models\Concert;
 use App\Models\Event;
-use App\Http\Requests\StoreEventsRequest;
+use App\Http\Requests\V1\StoreEventsRequest;
 use App\Http\Requests\UpdateEventsRequest;
 use Illuminate\Http\Request;
 
@@ -42,7 +41,7 @@ class EventController extends Controller
      */
     public function store(StoreEventsRequest $request)
     {
-        //
+        return new EventResource(Event::create($request->all()));
     }
 
     /**
