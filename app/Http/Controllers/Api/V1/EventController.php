@@ -9,7 +9,7 @@ use App\Http\Resources\V1\EventResource;
 use App\Filters\V1\EventFilter;
 use App\Models\Event;
 use App\Http\Requests\V1\StoreEventsRequest;
-use App\Http\Requests\UpdateEventsRequest;
+use App\Http\Requests\V1\UpdateEventRequest;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -63,9 +63,9 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEventsRequest $request, Event $events)
+    public function update(UpdateEventRequest $request, Event $event)
     {
-        //
+        $event->update($request->all());
     }
 
     /**

@@ -62,7 +62,8 @@ class ConcertController extends Controller
      */
     public function update(UpdateConcertsRequest $request, Concert $concerts)
     {
-        //
+        $concerts->update($request->all());
+        \Log::info('Updated event full:', ['event' => $concerts]);
     }
 
     /**

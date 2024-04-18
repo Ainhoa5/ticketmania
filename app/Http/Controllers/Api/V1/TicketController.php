@@ -7,7 +7,7 @@ use App\Http\Resources\V1\TicketCollection;
 use App\Http\Resources\V1\TicketResource;
 use App\Models\Ticket;
 use App\Http\Requests\V1\StoreTicketsRequest;
-use App\Http\Requests\V1\UpdateTicketsRequest;
+use App\Http\Requests\V1\UpdateTicketRequest;
 use App\Filters\V1\TicketFilter;
 use Illuminate\Http\Request;
 
@@ -62,10 +62,12 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketsRequest $request, Ticket $tickets)
+    public function update(UpdateTicketRequest $request, Ticket $ticket)
     {
-        //
+        // Update using only validated data.
+        $ticket->update($request->validated());
     }
+
 
     /**
      * Remove the specified resource from storage.
