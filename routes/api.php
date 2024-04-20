@@ -17,10 +17,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // api/v1
     Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], function() {
-        Route::apiResource('events', 'EventController');
-        Route::apiResource('concerts', 'ConcertController');
-        Route::apiResource('tickets', 'TicketController');
-        Route::apiResource('payments', 'PaymentController');
+        Route::apiResource('events', 'EventController')->except(['index', 'show']);;
+        Route::apiResource('concerts', 'ConcertController')->except(['index', 'show']);;
+        Route::apiResource('tickets', 'TicketController')->except(['index', 'show']);;
+        Route::apiResource('payments', 'PaymentController')->except(['index', 'show']);;
     });
+});
+
+// Unprotected read-only routes for v1 API
+Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], function() {
+    Route::get('events', 'EventController@index');
+    Route::get('events/{event}', 'EventController@show');
+    Route::get('concerts', 'ConcertController@index');
+    Route::get('concerts/{concert}', 'ConcertController@show');
+    Route::get('tickets', 'TicketController@index');
+    Route::get('tickets/{ticket}', 'TicketController@show');
+    Route::get('payments', 'PaymentController@index');
+    Route::get('payments/{payment}', 'PaymentController@show');
 });
 
