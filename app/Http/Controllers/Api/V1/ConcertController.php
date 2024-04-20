@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api\V1;
+
 use App\Http\Controllers\Controller;
 
 use App\Http\Resources\V1\ConcertCollection;
@@ -10,6 +11,8 @@ use App\Http\Requests\V1\StoreConcertsRequest;
 use App\Http\Requests\V1\UpdateConcertsRequest;
 use App\Filters\V1\ConcertFilter;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 class ConcertController extends Controller
 {
     /**
@@ -69,8 +72,9 @@ class ConcertController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Concert $concerts)
+    public function destroy(Concert $concert)
     {
-        //
+        $concert->delete();
+        return response()->json(['message' => 'Event deleted successfully'], Response::HTTP_OK);
     }
 }
