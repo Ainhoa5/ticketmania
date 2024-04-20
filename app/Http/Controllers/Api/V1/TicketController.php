@@ -10,6 +10,7 @@ use App\Http\Requests\V1\StoreTicketsRequest;
 use App\Http\Requests\V1\UpdateTicketRequest;
 use App\Filters\V1\TicketFilter;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TicketController extends Controller
 {
@@ -72,8 +73,10 @@ class TicketController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ticket $tickets)
+    public function destroy(Ticket $ticket)
     {
-        //
+
+        $ticket->delete();
+        return response()->json(['message' => 'Event deleted successfully'], Response::HTTP_OK);
     }
 }

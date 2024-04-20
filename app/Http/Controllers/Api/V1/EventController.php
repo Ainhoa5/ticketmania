@@ -11,6 +11,7 @@ use App\Models\Event;
 use App\Http\Requests\V1\StoreEventsRequest;
 use App\Http\Requests\V1\UpdateEventRequest;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventController extends Controller
 {
@@ -71,8 +72,9 @@ class EventController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Event $events)
+    public function destroy(Event $event)
     {
-        //
+        $event->delete();
+        return response()->json(['message' => 'Event deleted successfully'], Response::HTTP_OK);
     }
 }

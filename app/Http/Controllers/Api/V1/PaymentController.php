@@ -10,6 +10,7 @@ use App\Http\Requests\V1\StorePaymentsRequest;
 use App\Http\Requests\V1\UpdatePaymentsRequest;
 use App\Filters\V1\PaymentFilter;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class PaymentController extends Controller
 {
@@ -72,6 +73,8 @@ class PaymentController extends Controller
      */
     public function destroy(Payment $payment)
     {
-        //
+
+        $payment->delete();
+        return response()->json(['message' => 'Event deleted successfully'], Response::HTTP_OK);
     }
 }
