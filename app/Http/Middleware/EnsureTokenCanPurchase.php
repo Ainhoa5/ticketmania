@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureUserIsAdmin
+class EnsureTokenCanPurchase
 {
     /**
      * Handle an incoming request.
@@ -15,10 +15,10 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->user() && $request->user()->is_admin) {
-            return $next($request);
+        if (!$request->user() || !$request->user()->tokenCan('purchase')) {
+            return response()->json(['message' => 'Not authorized to perform this action'], 403);
         }
 
-        return response()->json(['message' => 'Unauthorized'], 403);
+        return $next($request);
     }
 }

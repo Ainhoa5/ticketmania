@@ -42,14 +42,16 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Verificar si el usuario es administrador antes de generar el token
         if ($user->is_admin) {
             $token = $user->createToken('Admin Access Token', ['create', 'update', 'delete'])->plainTextToken;
-            return response()->json(['token' => $token]);
+        } else {
+            // Permitir a los usuarios normales leer y comprar tickets
+            $token = $user->createToken('User Access Token', ['read', 'purchase'])->plainTextToken;
         }
 
-        return response()->json(['message' => 'Access granted, no token required'], 200);
+        return response()->json(['token' => $token]);
     }
+
 
 
     public function logout(Request $request)

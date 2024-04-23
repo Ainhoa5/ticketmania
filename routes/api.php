@@ -19,7 +19,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], function() {
         Route::apiResource('events', 'EventController')->except(['index', 'show']);;
         Route::apiResource('concerts', 'ConcertController')->except(['index', 'show']);;
-        Route::apiResource('tickets', 'TicketController')->except(['index', 'show']);;
+
+        // Apply specific permissions middleware to the tickets store method
+        Route::apiResource('tickets', 'TicketController')->except(['index', 'show', 'store']);
+        Route::post('tickets', 'TicketController@store')->middleware('can.purchase');
+
         Route::apiResource('payments', 'PaymentController')->except(['index', 'show']);;
     });
 });
