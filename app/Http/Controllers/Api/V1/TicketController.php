@@ -11,6 +11,7 @@ use App\Http\Requests\V1\UpdateTicketRequest;
 use App\Filters\V1\TicketFilter;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
@@ -39,10 +40,67 @@ class TicketController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTicketsRequest $request)
+    public function store(Request $request)
     {
-        return new TicketResource(Ticket::create($request->all()));
+        $concertId = $request->input('concertId');
+        $paymentMethodId = $request->input('payment_method_id');  // Assuming this is passed from the frontend
+
+        return DB::transaction(function () use ($request, $concertId, $paymentMethodId) {
+            $userId = $request->user()->id;
+            $concert = \App\Models\Concert::lockForUpdate()->find($concertId);
+            \Log::info($userId);
+            if ($concert && $concert->tickets_sold < $concert->capacity_total) {
+                // Initialize Stripe Client
+                $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+
+                // Attempt to charge the payment method
+                try {
+                    $paymentIntent = $stripe->paymentIntents->create([
+                        'amount' => $concert->price * 100, // Convert amount to cents
+                        'currency' => 'usd',
+                        'payment_method' => $paymentMethodId,
+                        'confirm' => true,
+                        'automatic_payment_methods' => ['enabled' => true],
+                        'use_stripe_sdk' => true, // Optional, for some additional features with Stripe.js
+                    ]);
+
+
+
+                    // Check if the payment is successfully confirmed
+                    if ($paymentIntent->status === 'succeeded') {
+                        $concert->tickets_sold++;
+                        $concert->save();
+
+                        $ticket = Ticket::create([
+                            'concert_id' => $concertId,
+                            'user_id' => $userId
+                        ]);
+
+                        $payment = \App\Models\Payment::create([
+                            'user_id' => $userId,
+                            'ticket_id' => $ticket->id,
+                            'amount' => $concert->price,
+                            'status' => 'completed',  // Mark as completed if payment is successful
+                            'stripe_payment_id' => $paymentIntent->id  // Store Stripe payment ID for reference
+                        ]);
+
+                        return new TicketResource($ticket);
+                    } else {
+                        return response()->json(['message' => 'Payment failed'], 402);
+                    }
+                } catch (\Stripe\Exception\ApiErrorException $e) {
+                    // Handle exceptions from Stripe
+                    return response()->json(['message' => 'Stripe API error: ' . $e->getMessage()], 500);
+                }
+            } else {
+                return response()->json([
+                    'message' => 'No tickets available or concert does not exist',
+                    'details' => 'Checked concert ID: ' . $concertId . ', Tickets sold: ' . ($concert ? $concert->tickets_sold : 'N/A') . ', Capacity: ' . ($concert ? $concert->capacity_total : 'N/A')
+                ], 400);
+            }
+        });
     }
+
 
     /**
      * Display the specified resource.

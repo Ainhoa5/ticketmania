@@ -35,8 +35,7 @@ class StoreTicketsRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'concert_id' => $this->concertId,
-            'user_id' => $this->userId
+            'concert_id' => $this->concertId
         ]);
     }
 }
