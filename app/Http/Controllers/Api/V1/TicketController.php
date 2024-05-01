@@ -60,6 +60,7 @@ class TicketController extends Controller
                         'currency' => 'usd',
                         'payment_method' => $paymentMethodId,
                         'confirm' => true,
+                        'return_url' => 'http://localhost:3000/payment-complete',
                         'automatic_payment_methods' => ['enabled' => true],
                         'use_stripe_sdk' => true, // Optional, for some additional features with Stripe.js
                     ]);
