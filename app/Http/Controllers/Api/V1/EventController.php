@@ -100,8 +100,25 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
-        $event->update($request->all());
+        // Log request values
+        \Log::info('Request values:', $request->all());
+
+        // Upload images to Cloudinary if provided
+        $imageCover = $this->uploadImage($request->file('image_cover'));
+        $imageBackground = $this->uploadImage($request->file('image_background'));
+
+        // Update event details
+        $event->update([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'image_cover' => $imageCover ?: $event->image_cover, // Keep existing image if not provided
+            'image_background' => $imageBackground ?: $event->image_background, // Keep existing image if not provided
+            // Add other fields as needed
+        ]);
+
+        return new EventResource($event);
     }
+
 
     /**
      * Remove the specified resource from storage.
