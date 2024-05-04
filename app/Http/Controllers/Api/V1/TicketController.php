@@ -44,48 +44,58 @@ class TicketController extends Controller
     {
         $concertId = $request->input('concertId');
         $paymentMethodId = $request->input('payment_method_id');  // Assuming this is passed from the frontend
+        $ticketQuantity = $request->input('ticketQuantity', 1); // Default to 1 ticket if quantity is not specified
 
-        return DB::transaction(function () use ($request, $concertId, $paymentMethodId) {
+        return DB::transaction(function () use ($request, $concertId, $paymentMethodId, $ticketQuantity) {
             $userId = $request->user()->id;
             $concert = \App\Models\Concert::lockForUpdate()->find($concertId);
-            \Log::info($userId);
+
             if ($concert && $concert->tickets_sold < $concert->capacity_total) {
                 // Initialize Stripe Client
                 $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 
                 // Attempt to charge the payment method
                 try {
+                    // Calculate total amount for all tickets
+                    $totalAmount = $concert->price * $ticketQuantity * 100; // Convert amount to cents
+
+                    // Create payment intent for multiple tickets
                     $paymentIntent = $stripe->paymentIntents->create([
-                        'amount' => $concert->price * 100, // Convert amount to cents
+                        'amount' => $totalAmount,
                         'currency' => 'usd',
                         'payment_method' => $paymentMethodId,
                         'confirm' => true,
                         'return_url' => 'http://localhost:3000/payment-complete',
                         'automatic_payment_methods' => ['enabled' => true],
-                        'use_stripe_sdk' => true, // Optional, for some additional features with Stripe.js
+                        'use_stripe_sdk' => true,
                     ]);
-
-
 
                     // Check if the payment is successfully confirmed
                     if ($paymentIntent->status === 'succeeded') {
-                        $concert->tickets_sold++;
+                        // Increment tickets sold count for the concert
+                        $concert->tickets_sold += $ticketQuantity;
                         $concert->save();
 
-                        $ticket = Ticket::create([
-                            'concert_id' => $concertId,
-                            'user_id' => $userId
-                        ]);
+                        // Create multiple tickets and associated payments
+                        $tickets = [];
+                        for ($i = 0; $i < $ticketQuantity; $i++) {
+                            $ticket = Ticket::create([
+                                'concert_id' => $concertId,
+                                'user_id' => $userId
+                            ]);
 
-                        $payment = \App\Models\Payment::create([
-                            'user_id' => $userId,
-                            'ticket_id' => $ticket->id,
-                            'amount' => $concert->price,
-                            'status' => 'completed',  // Mark as completed if payment is successful
-                            'stripe_payment_id' => $paymentIntent->id  // Store Stripe payment ID for reference
-                        ]);
+                            $payment = \App\Models\Payment::create([
+                                'user_id' => $userId,
+                                'ticket_id' => $ticket->id,
+                                'amount' => $concert->price,
+                                'status' => 'completed',
+                                'stripe_payment_id' => $paymentIntent->id
+                            ]);
 
-                        return new TicketResource($ticket);
+                            $tickets[] = $ticket;
+                        }
+
+                        return response()->json(['tickets' => $tickets], 200);
                     } else {
                         return response()->json(['message' => 'Payment failed'], 402);
                     }
@@ -101,6 +111,7 @@ class TicketController extends Controller
             }
         });
     }
+
 
 
     /**

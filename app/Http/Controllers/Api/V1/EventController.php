@@ -12,6 +12,7 @@ use App\Http\Requests\V1\StoreEventsRequest;
 use App\Http\Requests\V1\UpdateEventRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class EventController extends Controller
 {
@@ -42,8 +43,41 @@ class EventController extends Controller
      */
     public function store(StoreEventsRequest $request)
     {
-        return new EventResource(Event::create($request->all()));
+        // Upload images to Cloudinary
+        $imageCover = $this->uploadImage($request->file('image_cover'));
+        $imageBackground = $this->uploadImage($request->file('image_background'));
+
+        // Create event in database
+        $event = Event::create([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'image_cover' => $imageCover,
+            'image_background' => $imageBackground
+        ]);
+
+        return new EventResource($event);
     }
+
+    /**
+     * Upload image to Cloudinary and return its URL.
+     */
+    private function uploadImage($image)
+    {
+        if ($image) {
+            // Log Cloudinary configuration
+            \Log::info('Cloudinary configuration:');
+            \Log::info(config('cloudinary'));
+
+            // Upload image to Cloudinary
+            $cloudinaryResponse = Cloudinary::upload($image->getPathname());
+
+            // Get URL from Cloudinary response
+            return $cloudinaryResponse->getSecurePath();
+        }
+
+        return null; // Return null if no image provided
+    }
+
 
     /**
      * Display the specified resource.

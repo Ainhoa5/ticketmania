@@ -42,15 +42,19 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        // Delete existing tokens
+        $user->tokens()->delete();
+
         if ($user->is_admin) {
             $token = $user->createToken('Admin Access Token', ['create', 'update', 'delete'])->plainTextToken;
         } else {
-            // Permitir a los usuarios normales leer y comprar tickets
+            // Allow regular users to read and purchase tickets
             $token = $user->createToken('User Access Token', ['read', 'purchase'])->plainTextToken;
         }
 
         return response()->json(['token' => $token]);
     }
+
 
 
 
