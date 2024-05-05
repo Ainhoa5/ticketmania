@@ -47,9 +47,9 @@ class ConcertController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Concert $concerts)
+    public function show(Concert $concert)
     {
-        return new ConcertResource($concerts);
+        return new ConcertResource($concert);
     }
 
     /**
@@ -63,11 +63,12 @@ class ConcertController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateConcertsRequest $request, Concert $concerts)
+    public function update(UpdateConcertsRequest $request, Concert $concert)
     {
-        $concerts->update($request->all());
-        \Log::info('Updated event full:', ['event' => $concerts]);
+        $concert->update($request->all());
+        $concert->refresh(); // Refresh the model instance to ensure it reflects the updated state
     }
+
 
     /**
      * Remove the specified resource from storage.

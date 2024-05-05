@@ -50,16 +50,15 @@ class UpdateConcertsRequest extends FormRequest
     protected function prepareForValidation()
     {
         $data = [];
-        if ($this->has('eventId')) {
-            $data['event_id'] = $this->eventId;
-        }
-        if ($this->has('capacityTotal')) {
-            $data['capacity_total'] = $this->capacityTotal;
-        }
-        if ($this->has('ticketsSold')) {
-            $data['tickets_sold'] = $this->ticketsSold;
+        foreach (['eventId', 'capacityTotal', 'ticketsSold'] as $key) {
+            if ($this->has($key)) {
+                // Convert camelCase to snake_case for the database fields
+                $snakeKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
+                $data[$snakeKey] = $this->{$key};
+            }
         }
 
         $this->merge($data);
     }
+
 }
