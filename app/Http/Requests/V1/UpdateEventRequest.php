@@ -19,26 +19,16 @@ class UpdateEventRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules()
     {
-        $method = $this->method();
-
-        if ($method == 'PUT') {
-            return [
-                'name' => ['required'],
-                'description' => ['required'],
-                'image_cover' => ['required'],
-                'image_background' => ['required']
-            ];
-        } else {
-            return [
-                'name' => ['sometimes', 'required'],
-                'description' => ['sometimes', 'required'],
-                'image_cover' => ['sometimes', 'required'],
-                'image_background' => ['sometimes', 'required']
-            ];
-        }
+        return [
+            'name' => 'sometimes|required',
+            'description' => 'sometimes|required',
+            'image_cover' => 'sometimes|image|max:2048',  // make sure to validate it's an image if you're uploading one
+            'image_background' => 'sometimes|image|max:2048'
+        ];
     }
+
 
     /**
      * Prepare the data for validation.

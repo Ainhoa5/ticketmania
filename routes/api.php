@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Apply specific permissions middleware to the tickets store method
         Route::apiResource('tickets', 'TicketController')->except(['index', 'show', 'store']);
         Route::post('tickets', 'TicketController@store')->middleware('can.purchase');
+        Route::post('events/{event}', 'EventController@update')->name('events.update'); // to handle form-data updates
 
         Route::apiResource('payments', 'PaymentController')->except(['index', 'show']);;
     });

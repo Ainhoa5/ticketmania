@@ -63,20 +63,18 @@ class EventController extends Controller
      */
     private function uploadImage($image)
     {
-        if ($image) {
-            // Log Cloudinary configuration
-            \Log::info('Cloudinary configuration:');
-            \Log::info(config('cloudinary'));
+        if (!$image)
+            return null;
 
-            // Upload image to Cloudinary
+        try {
             $cloudinaryResponse = Cloudinary::upload($image->getPathname());
-
-            // Get URL from Cloudinary response
             return $cloudinaryResponse->getSecurePath();
+        } catch (\Exception $e) {
+            \Log::error('Failed to upload image to Cloudinary:', ['error' => $e->getMessage()]);
+            return null;
         }
-
-        return null; // Return null if no image provided
     }
+
 
 
     /**
@@ -100,24 +98,20 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
-        // Log request values
-        \Log::info('Request values:', $request->all());
+        \Log::info('Raw input:', $request->all());
+        $imageCover = $request->hasFile('image_cover') ? $this->uploadImage($request->file('image_cover')) : $event->image_cover;
+        $imageBackground = $request->hasFile('image_background') ? $this->uploadImage($request->file('image_background')) : $event->image_background;
 
-        // Upload images to Cloudinary if provided
-        $imageCover = $this->uploadImage($request->file('image_cover'));
-        $imageBackground = $this->uploadImage($request->file('image_background'));
-
-        // Update event details
         $event->update([
-            'name' => $request->input('name'),
-            'description' => $request->input('description'),
-            'image_cover' => $imageCover ?: $event->image_cover, // Keep existing image if not provided
-            'image_background' => $imageBackground ?: $event->image_background, // Keep existing image if not provided
-            // Add other fields as needed
+            'name' => $request->input('name', $event->name),
+            'description' => $request->input('description', $event->description),
+            'image_cover' => $imageCover,
+            'image_background' => $imageBackground,
         ]);
 
         return new EventResource($event);
     }
+
 
 
     /**
