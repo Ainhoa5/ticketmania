@@ -23,10 +23,14 @@ class TicketController extends Controller
         $filter = new TicketFilter();
         $filterItems = $filter->transform($request); // Converts request parameters into a format suitable for query filtering
 
+        // Apply additional filter to restrict tickets to those bought by the current user
+        $filterItems[] = ['user_id', '=', auth()->id()];
+
         $tickets = Ticket::where($filterItems);
 
         return new TicketCollection($tickets->paginate()->appends($request->query()));
     }
+
 
 
     /**
