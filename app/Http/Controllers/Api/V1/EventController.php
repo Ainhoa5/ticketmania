@@ -98,6 +98,8 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
+        \Log::info("SE HA LLAMADO");
+
         \Log::info('Raw input:', $request->all());
         $imageCover = $request->hasFile('image_cover') ? $this->uploadImage($request->file('image_cover')) : $event->image_cover;
         $imageBackground = $request->hasFile('image_background') ? $this->uploadImage($request->file('image_background')) : $event->image_background;

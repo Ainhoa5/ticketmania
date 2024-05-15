@@ -8,8 +8,44 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 
+/**
+ * Clase AuthController
+ *
+ * Controlador para la autenticación de usuarios.
+ *
+ * @package App\Http\Controllers\API\V1
+ */
 class AuthController extends Controller
 {
+    /**
+     * Registra un nuevo usuario.
+     *
+     * @param Request $request La solicitud HTTP.
+     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON.
+     *
+     * @OA\Post(
+     *     path="/api/v1/register",
+     *     summary="Registra un nuevo usuario",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password", "is_admin"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password"),
+     *             @OA\Property(property="is_admin", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Usuario registrado exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Datos de validación incorrectos"
+     *     )
+     * )
+     */
     public function register(Request $request)
     {
         $validatedData = $request->validate([
@@ -26,9 +62,36 @@ class AuthController extends Controller
             'is_admin' => $validatedData['is_admin']
         ]);
 
-        return response()->json(['message' => 'User registered successfully', 'user' => $user]);
+        return response()->json(['message' => 'Usuario registrado exitosamente', 'user' => $user]);
     }
 
+    /**
+     * Inicia sesión para un usuario.
+     *
+     * @param Request $request La solicitud HTTP.
+     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON.
+     *
+     * @OA\Post(
+     *     path="/api/v1/login",
+     *     summary="Inicia sesión para un usuario",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Inicio de sesión exitoso"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autorizado"
+     *     )
+     * )
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -37,33 +100,43 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'No autorizado'], 401);
         }
 
         $user = Auth::user();
 
-        // Delete existing tokens
+        // Eliminar tokens existentes
         $user->tokens()->delete();
 
         if ($user->is_admin) {
             $token = $user->createToken('Admin Access Token', ['create', 'update', 'delete'])->plainTextToken;
         } else {
-            // Allow regular users to read and purchase tickets
+            // Permitir a los usuarios regulares leer y comprar boletos
             $token = $user->createToken('User Access Token', ['read', 'purchase'])->plainTextToken;
         }
 
         return response()->json(['token' => $token]);
     }
 
-
-
-
+    /**
+     * Cierra sesión para un usuario.
+     *
+     * @param Request $request La solicitud HTTP.
+     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON.
+     *
+     * @OA\Post(
+     *     path="/api/v1/logout",
+     *     summary="Cierra sesión para un usuario",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Tokens revocados"
+     *     )
+     * )
+     */
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Tokens revoked']);
+        return response()->json(['message' => 'Tokens revocados']);
     }
-
-
 }
