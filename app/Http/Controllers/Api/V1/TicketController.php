@@ -12,6 +12,7 @@ use App\Filters\V1\TicketFilter;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
@@ -49,6 +50,17 @@ class TicketController extends Controller
         $concertId = $request->input('concertId');
         $paymentMethodId = $request->input('payment_method_id');  // Assuming this is passed from the frontend
         $ticketQuantity = $request->input('ticketQuantity', 1); // Default to 1 ticket if quantity is not specified
+        // Log the incoming request data
+        Log::info('Incoming ticket purchase request', [
+            'concertId' => $concertId,
+            'paymentMethodId' => $paymentMethodId,
+            'ticketQuantity' => $ticketQuantity,
+        ]);
+
+
+        // Log the Stripe secret to check if it's being loaded
+        $stripeSecret = env('STRIPE_SECRET');
+        Log::info('Stripe Secret:', ['stripe_secret' => $stripeSecret]);
 
         return DB::transaction(function () use ($request, $concertId, $paymentMethodId, $ticketQuantity) {
             $userId = $request->user()->id;
@@ -115,6 +127,7 @@ class TicketController extends Controller
             }
         });
     }
+
 
 
 
