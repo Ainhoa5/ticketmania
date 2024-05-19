@@ -8,6 +8,73 @@ TicketMania es una API RESTful para manejar la compra de entradas a diferentes e
 ## Propósito
 El propósito de TicketMania es optimizar el proceso de gestión de ventas de entradas para eventos. Ya sea que seas un desarrollador construyendo una aplicación o un negocio integrando funcionalidades de venta de entradas, nuestra API ofrece una solución sin problemas para manejar datos relacionados con eventos.
 
+
+# Instalación
+## Requisitos Previos
+
+Antes de comenzar, asegúrate de tener instaladas las siguientes herramientas en tu máquina:
+
+- PHP >= 7.4
+- Composer
+- MySQL o cualquier otro sistema de base de datos compatible
+- Node.js y npm (opcional, si necesitas compilar assets con Laravel Mix)
+
+## Instalación del Proyecto
+
+Sigue estos pasos para instalar y configurar el proyecto:
+
+### 1. Clonar el Repositorio
+
+Primero, clona el repositorio desde tu sistema de control de versiones (por ejemplo, GitHub):
+
+```bash
+git clone https://github.com/Ainhoa5/ticketmania.git
+cd ticketmania
+```
+### 2. Instalar Dependencias
+
+A continuación, instala las dependencias de PHP utilizando Composer:
+
+```bash
+composer install
+```
+
+### 4. Generar la Clave de la Aplicación
+
+Genera una nueva clave de aplicación para tu proyecto Laravel:
+
+```bash
+php artisan key:generate
+
+```
+### 5. Migrar la Base de Datos
+
+Ejecuta las migraciones para crear las tablas necesarias en tu base de datos:
+
+```bash
+php artisan migrate
+```
+### 6. Poblar la Base de Datos (Opcional)
+
+Si quieres seeders para poblar la base de datos con datos iniciales, puedes ejecutarlos con el siguiente comando:
+
+```bash
+php artisan db:seed
+```
+### 7. Iniciar el Servidor de Desarrollo
+
+Finalmente, inicia el servidor de desarrollo de Laravel:
+
+```bash
+php artisan serve
+```
+Visita http://localhost:8000 en tu navegador para ver la aplicación en funcionamiento.
+
+### Conclusión
+
+¡Y eso es todo! Ahora deberías tener tu proyecto Laravel configurado y en funcionamiento. Si tienes algún problema durante la instalación, asegúrate de revisar los requisitos previos y la configuración de tu archivo .env. ¡Buena suerte!
+
+
 ## Autenticación
 La autenticación con TicketMania se realiza mediante tokens OAuth 2.0. Los clientes que utilizen los programas de los desarrolladores pueden obtener tokens de acceso registrando su aplicación y siguiendo el flujo de autenticación para poder realizar la compra online de las entradas. A su vez, los propios desarrolladores deben registrarse de la misma forma para poder acceder a las rutas de creacion, edición y eliminacion de las entidades de la API.
 
